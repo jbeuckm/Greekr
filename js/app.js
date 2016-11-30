@@ -7,7 +7,7 @@ angular.module('greekr', []).run(function (localCsvService) {
         var f = document.querySelector('input[type=file]').files[0];
         
         if (f) {
-            localCsvService.parseFile(f);
+            localCsvService.parseFile(f).then(console.log);
         }
     }
 
