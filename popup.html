@@ -1,16 +1,33 @@
 <html>
-    
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
-    <script src="popup.js"></script>
 
-    <body ng-app="greekr">
-    
-    <p>Choose the CSV file to be obfuscated:</p>
-        
-    <input type="file" id="csv_file" accept=".csv">
-        
-    <button id="obfuscate">Obfuscate</button>
-        
-    </body>
-    
+<script src="bower_components/angular/angular.min.js"></script>
+<script src="bower_components/papaparse/papaparse.min.js"></script>
+
+    <script src="js/app.js"></script>
+    <script src="js/services/local-csv-service.js"></script>
+
+<body ng-app="greekr">
+
+    <div class="input-group">
+        <label>Salt</label>
+        <input type="text" class="form-control" id="salt" size="100">
+    </div>
+
+    <div class="input-group">
+        <label>Rounds</label>
+        <input type="number" class="form-control" id="rounds">
+    </div>
+
+    <div class="input-group">
+        <p>Choose the CSV file to be obfuscated:</p>
+
+        <input type="file" id="csv_file" accept=".csv">
+    </div>
+
+    <div class="input-group">
+        <button id="obfuscate">Obfuscate</button>
+    </div>
+
+</body>
+
 </html>
