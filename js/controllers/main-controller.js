@@ -3,9 +3,7 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
     $scope.config = {
         salt: "NaCl",
         rounds: 5,
-        cols: {
-        
-        }
+        cols: {}
     };
     
     $scope.$watch('config', function(){
