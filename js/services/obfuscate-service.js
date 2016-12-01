@@ -13,18 +13,21 @@ angular.module('greekr').factory('obfuscateService', function () {
 
                     switch (config.cols[key]) {
 
-                    case "drop":
-                        break;
-
                     case "hash":
-                        var hash = CryptoJS.MD5(row[key]);
-                        newRow[key] = hash.toString(CryptoJS.enc.Hex);
+                        var hash = row[key] + config.salt;
 
+                        var rounds = parseInt(config.rounds);
+                        for (var i = 0; i < rounds; i++) {
+                            hash = CryptoJS.MD5(hash);
+                        }
+                            
+                        newRow[key] = hash.toString(CryptoJS.enc.Hex);
                         break;
 
                     case "raw":
                         newRow[key] = row[key];
                         break;
+
                     }
 
 

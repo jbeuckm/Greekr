@@ -1,10 +1,17 @@
 angular.module('greekr').controller('MainController', function ($scope, localCsvService, obfuscateService) {
     
     $scope.config = {
-        salt: "NaCl",
-        rounds: 5,
+        salt: localStorage.getItem('greekr_salt'),
+        rounds: localStorage.getItem('greekr_rounds'),
         cols: {}
     };
+    
+    $scope.$watch('config.salt', function(value){
+        localStorage.setItem('greekr_salt', value);
+    });
+    $scope.$watch('config.rounds', function(value){
+        localStorage.setItem('greekr_rounds', value);
+    });
     
     $scope.$watch('config', function(){
         $scope.obfuscatedData = obfuscateService.process($scope.config, $scope.data);
