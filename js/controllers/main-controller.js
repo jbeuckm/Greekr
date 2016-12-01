@@ -7,6 +7,10 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
         
         }
     };
+    
+    $scope.$watch('config', function(){
+        $scope.obfuscatedData = obfuscateService.process($scope.config, $scope.data);
+    }, true);
 
     function previewFile() {
         

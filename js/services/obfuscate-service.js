@@ -2,6 +2,8 @@ angular.module('greekr').factory('obfuscateService', function () {
 
     return {
         process: function (config, data) {
+            
+            if (!data) return;
 
             var obfuscated = data.map(function (row) {
 
