@@ -46,6 +46,9 @@
                         {{key}}
                     </th>
                     <td>
+                        <button ng-click="dropColumn(key)">drop</button>
+                    </td>
+                    <td>
                         <select ng-model="config.cols[key]">
                             <option value="drop">drop</option>
                             <option value="raw">raw</option>

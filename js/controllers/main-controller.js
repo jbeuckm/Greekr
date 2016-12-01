@@ -1,5 +1,15 @@
-angular.module('greekr').controller('MainController', function ($scope, localCsvService, obfuscateService) {
-    
+angular.module('greekr').controller('MainController', function ($scope, localCsvService, obfuscateService, $indexedDB) {
+
+    $indexedDB.openStore('hashes', function(store){
+
+      store.insert({"hash": "444-444-222-111","value": "John Doe"}).then(console.log);
+
+      store.getAll().then(function(hashes) {  
+          
+        console.log(hashes);
+      });
+    })
+      
     $scope.config = {
         salt: localStorage.getItem('greekr_salt'),
         rounds: localStorage.getItem('greekr_rounds'),
@@ -36,6 +46,10 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
                 $scope.obfuscatedData = obfuscateService.process($scope.config, data);
             });
         }
+    }
+    
+    $scope.dropColumn = function(key) {
+        $scope.config.cols[key] = 'drop';
     }
 
     function obfuscate() {
