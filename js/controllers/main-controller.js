@@ -28,6 +28,9 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
                 console.log(data);
                 
                 $scope.keys = Object.keys(data[0]);
+                $scope.keys.forEach(function(key){
+                    $scope.config.cols[key] = 'raw';
+                });
                 $scope.data = data;
                 
                 $scope.obfuscatedData = obfuscateService.process($scope.config, data);

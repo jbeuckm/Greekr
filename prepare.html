@@ -10,6 +10,7 @@
     <script src="js/services/local-csv-service.js"></script>
     <script src="js/services/obfuscate-service.js"></script>
     <script src="js/controllers/main-controller.js"></script>
+    <script src="bower_components/angular-indexed-db/angular-indexed-db.min.js"></script>
 
     <script src="bower_components/cryptojslib/rollups/md5.js"></script>
     <script src="bower_components/cryptojslib/components/enc-base64-min.js"></script>
@@ -36,14 +37,15 @@
             <input type="file" id="csv_file" accept=".csv">
         </div>
 
-        <div>
+        <div class="side-scroll">
 
             <table>
 
-                <tr>
-                    <th ng-repeat="key in keys">
+                <tr ng-repeat="key in keys">
+                    <th>
                         {{key}}
-
+                    </th>
+                    <td>
                         <select ng-model="config.cols[key]">
                             <option value="drop">drop</option>
                             <option value="raw">raw</option>
@@ -51,14 +53,15 @@
                             <option value="linear">linear</option>
                         </select>
 
-                    </th>
+                    </td>
+
+                    <td>
+                        <span ng-repeat="row in obfuscatedData">
+                            {{row[key]}}
+                        </span>
+                    </td>
 
                 </tr>
-
-                <tr ng-repeat="row in obfuscatedData">
-                    <td ng-repeat="key in keys">{{row[key]}}</td>
-                </tr>
-
 
             </table>
         </div>
