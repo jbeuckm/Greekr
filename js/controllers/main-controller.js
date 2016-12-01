@@ -1,4 +1,12 @@
-angular.module('greekr').controller('MainController', function ($scope, localCsvService) {
+angular.module('greekr').controller('MainController', function ($scope, localCsvService, obfuscateService) {
+    
+    $scope.config = {
+        salt: "NaCl",
+        rounds: 5,
+        cols: {
+        
+        }
+    };
 
     function previewFile() {
         
@@ -12,6 +20,8 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
                 
                 $scope.keys = Object.keys(data[0]);
                 $scope.data = data;
+                
+                $scope.obfuscatedData = obfuscateService.process($scope.config, data);
             });
         }
     }

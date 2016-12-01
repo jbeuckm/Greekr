@@ -17,6 +17,7 @@
   "dependencies": {
     "papaparse": "~4.1.2",
     "angular": "~1.5.9",
-    "bootstrap": "~3.3.7"
+    "bootstrap": "~3.3.7",
+    "cryptojslib": "~3.1.2"
   }
 }

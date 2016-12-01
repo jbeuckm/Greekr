@@ -1,0 +1,75 @@
+<html>
+
+<head>
+    <link href="css/styles.css" rel="stylesheet">
+
+    <script src="bower_components/angular/angular.min.js"></script>
+    <script src="bower_components/papaparse/papaparse.min.js"></script>
+
+    <script src="js/prepare-app.js"></script>
+    <script src="js/services/local-csv-service.js"></script>
+    <script src="js/services/obfuscate-service.js"></script>
+    <script src="js/controllers/main-controller.js"></script>
+
+    <script src="bower_components/cryptojslib/rollups/md5.js"></script>
+    <script src="bower_components/cryptojslib/components/enc-base64-min.js"></script>
+
+</head>
+
+<body ng-app="greekr">
+
+    <div ng-controller="MainController">
+
+        <div class="input-group">
+            <label>Salt</label>
+            <input type="text" class="form-control" ng-model="config.salt" size="100">
+        </div>
+
+        <div class="input-group">
+            <label>Rounds</label>
+            <input type="number" class="form-control" ng-model="config.rounds">
+        </div>
+
+        <div class="input-group">
+            <p>Choose the CSV file to be obfuscated:</p>
+
+            <input type="file" id="csv_file" accept=".csv">
+        </div>
+
+        <div>
+
+            <table>
+
+                <tr>
+                    <th ng-repeat="key in keys">
+                        {{key}}
+
+                        <select ng-model="config.cols[key]">
+                            <option value="raw">raw</option>
+                            <option value="hash">hash</option>
+                            <option value="linear">linear</option>
+                        </select>
+
+                    </th>
+
+                </tr>
+
+                <tr ng-repeat="row in obfuscatedData">
+                    <td ng-repeat="key in keys">{{row[key]}}</td>
+                </tr>
+
+
+            </table>
+        </div>
+
+        <div class="input-group">
+            <button id="obfuscate">Obfuscate</button>
+        </div>
+
+        <pre>{{ config }}</pre>
+
+    </div>
+
+</body>
+
+</html>

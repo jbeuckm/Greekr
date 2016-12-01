@@ -1,0 +1,13 @@
+td {
+    border-left: 1px solid black;
+    padding: 3px;
+}
+
+tr {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2
+}
