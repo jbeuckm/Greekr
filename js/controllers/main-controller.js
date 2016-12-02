@@ -1,4 +1,4 @@
-angular.module('greekr').controller('MainController', function ($scope, localCsvService, obfuscateService) {
+angular.module('greekr').controller('MainController', function ($scope, localCsvService) {
 
     $scope.config = {
         salt: localStorage.getItem('greekr_salt'),
@@ -14,7 +14,7 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
     });
 
     $scope.$watch('config', function () {
-        $scope.obfuscatedData = obfuscateService.process($scope.config, $scope.data);
+        $scope.obfuscatedData = Greekr.process($scope.config, $scope.data);
     }, true);
 
     function previewFile() {
@@ -33,7 +33,7 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
                 });
                 $scope.data = data;
 
-                $scope.obfuscatedData = obfuscateService.process($scope.config, data);
+                $scope.obfuscatedData = Greekr.process($scope.config, data);
             });
         }
     }
