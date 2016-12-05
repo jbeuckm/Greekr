@@ -4,12 +4,27 @@ importScripts('bower_components/papaparse/papaparse.min.js', 'greekr.js');
 self.onmessage = function (msg) {
 
     switch (msg.data.command) {
-    case 'start':
-        obfuscateFile(msg.data.file, msg.data.config);
-        break;
+
+        case 'csv_head':
+            readCsvHead(msg.data.file);
+            break;
+            
+        case 'obfuscate':
+            obfuscateData(msg.data.data, msg.data.config);
+            break;
+            
+        case 'obfuscate_file':
+            obfuscateFile(msg.data.file, msg.data.config);
+            break;
     }
     console.log(msg.data);
 };
+
+
+function obfuscateData(data, config) {    
+    var processed = Greekr.process(config, data);
+    postResults('obfuscate', processed);
+}
 
 
 function obfuscateFile(file, config) {
@@ -21,19 +36,27 @@ function obfuscateFile(file, config) {
             config.cols[key] = 'raw';
         })
         
-    console.log('will process');
-    console.log(config);
-    var processed = Greekr.process(config, data);
-    console.log(processed);
-        self.postMessage(processed);
+        console.log('will process');
+        console.log(config);
+        var processed = Greekr.process(config, data);
+        console.log(processed);
+        
+        postResults('obfuscate', {});
     });
 
 }
 
 
-function readCsvHead(file, callback) {
+function postResults(type, data) {
+    self.postMessage({
+        type: type,
+        data: data
+    });
+}
 
-        var r = new FileReader();
+function readCsvHead(file, lines) {
+
+    var r = new FileReader();
 
     r.addEventListener("error", function (err) {
         console.error(err);
@@ -50,16 +73,16 @@ function readCsvHead(file, callback) {
             step: function (results, parser) {
                 data.push(results.data[0]);
 
-                if (data.length == 10) {
+                if (data.length == lines) {
                     parser.abort();                    
                     
-                    callback(data);
+                    postResults("csv_head", data);
                 }
             }
 
         });
 
     }
+    
     r.readAsText(file);
-
 }
