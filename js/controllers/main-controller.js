@@ -3,7 +3,8 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
     $scope.config = {
         salt: localStorage.getItem('greekr_salt'),
         rounds: localStorage.getItem('greekr_rounds'),
-        cols: {}
+        cols: {},
+        hashColumnName: {}
     };
 
     $scope.$watch('config.salt', function (value) {
@@ -26,6 +27,11 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
         readCsvHead(file, 10, function(data){
             $scope.data = data;
             $scope.keys = Object.keys(data[0]);
+            
+            $scope.keys.forEach(function(key){
+                $scope.config.hashColumnName[key] = true;
+            });
+            
             updatePreview(data);
             $scope.$apply();
         });
@@ -36,7 +42,9 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
         var worker = new Worker("greekr-worker.js");
 
         worker.onmessage = function (event) {
+            console.log(event.data);
             $scope.obfuscatedData = event.data.data;
+            $scope.processedColumnNames = event.data.processedColumnNames;
             $scope.$apply();
         };
         worker.postMessage({

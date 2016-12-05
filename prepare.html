@@ -42,33 +42,50 @@
 
             <table>
 
-                <tr ng-repeat="key in keys">
-                    <th>
-                        {{key}}
-                    </th>
-                    <td>
-                        <button ng-click="dropColumn(key)">drop</button>
-                    </td>
-                    <td>
-                        <select ng-model="config.cols[key]" ng-change="changeColConfig()">
-                            <option value="drop">drop</option>
-                            <option value="raw">raw</option>
-                            <option value="hash">hash</option>
-                            <option value="linear">linear</option>
-                        </select>
+                <tbody ng-repeat="key in keys">
+                    <tr>
+                        <td>
+                            <span class="column-name">{{key}}</span>
+                            <label>hash:</label>
+                            <input type="checkbox" ng-model="config.hashColumnName[key]">
+                        </td>
+                        <td>
+                            <button ng-click="dropColumn(key)">drop</button>
+                        </td>
+                        <td>
+                            <select ng-model="config.cols[key]" ng-change="changeColConfig()">
+                                <option value="drop">drop</option>
+                                <option value="raw">raw</option>
+                                <option value="hash">hash</option>
+                                <option value="linear">linear</option>
+                            </select>
+                        </td>
 
-                    </td>
+                        <td>
+                            <span class="raw-data" ng-repeat="row in data">
+                                {{row[key]}}
+                            </span>
+                        </td>
 
-                    <td>
-                        <span ng-repeat="row in data">
-                            {{row[key]}}
-                        </span>
-                        <span ng-repeat="row in obfuscatedData">
-                            {{row[key]}}
-                        </span>
-                    </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span>{{processedColumnNames[key]}}</span>
+                        </td>
+                        <td>
+                        </td>
+                        <td>
 
-                </tr>
+                        </td>
+
+                        <td>
+                            <span ng-repeat="row in obfuscatedData">
+                                {{row[processedColumnNames[key]]}}
+                            </span>
+                        </td>
+
+                    </tr>
+                </tbody>
 
             </table>
         </div>

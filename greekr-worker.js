@@ -12,39 +12,18 @@ self.onmessage = function (msg) {
             
         case 'obfuscate':
             obfuscateData(msg.data.data, msg.data.config);
-            break;
-            
-        case 'obfuscate_file':
-            obfuscateFile(msg.data.file, msg.data.config);
-            break;
+            break;            
     }
-    console.log(msg.data);
 };
 
 
 function obfuscateData(data, config) {    
-    var processed = Greekr.process(config, data);
-    postResults('obfuscate', processed);
-}
-
-
-function obfuscateFile(file, config) {
-    
-    readCsvHead(file, function(data){
-        
-        config.cols = {};
-        Object.keys(data[0]).forEach(function(key){
-            config.cols[key] = 'raw';
-        })
-        
-        console.log('will process');
-        console.log(config);
-        var processed = Greekr.process(config, data);
-        console.log(processed);
-        
-        postResults('obfuscate', {});
+    var results = Greekr.process(config, data);
+    self.postMessage({
+        type: 'obfuscate',
+        data: results.data,
+        processedColumnNames: results.processedColumnNames
     });
-
 }
 
 
