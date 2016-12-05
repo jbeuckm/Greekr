@@ -1,6 +1,4 @@
-importScripts('bower_components/papaparse/papaparse.min.js');
-
-console.log('hi from worker');
+importScripts('bower_components/papaparse/papaparse.min.js', 'greekr.js');
 
 
 self.onmessage = function (msg) {
@@ -15,8 +13,27 @@ self.onmessage = function (msg) {
 
 
 function obfuscateFile(file, config) {
+    
+    readCsvHead(file, function(data){
+        
+        config.cols = {};
+        Object.keys(data[0]).forEach(function(key){
+            config.cols[key] = 'raw';
+        })
+        
+    console.log('will process');
+    console.log(config);
+    var processed = Greekr.process(config, data);
+    console.log(processed);
+        self.postMessage(processed);
+    });
 
-    var r = new FileReader();
+}
+
+
+function readCsvHead(file, callback) {
+
+        var r = new FileReader();
 
     r.addEventListener("error", function (err) {
         console.error(err);
@@ -34,8 +51,9 @@ function obfuscateFile(file, config) {
                 data.push(results.data[0]);
 
                 if (data.length == 10) {
-                    parser.abort();
-                    self.postMessage('parsed csv');
+                    parser.abort();                    
+                    
+                    callback(data);
                 }
             }
 

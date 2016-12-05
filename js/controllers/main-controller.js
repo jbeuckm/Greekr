@@ -14,28 +14,29 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
     });
 
     $scope.$watch('config', function () {
-        $scope.obfuscatedData = Greekr.process($scope.config, $scope.data);
+//        $scope.obfuscatedData = Greekr.process($scope.config, $scope.data);
     }, true);
 
     function previewFile() {
 
         console.log('previewFile');
 
-        var f = document.querySelector('input[type=file]').files[0];
+        var file = document.querySelector('input[type=file]').files[0];
 
-        if (f) {
-            localCsvService.parseFile(f).then(function (data) {
-                console.log(data);
+        var worker = new Worker("greekr-worker.js");
 
-                $scope.keys = Object.keys(data[0]);
-                $scope.keys.forEach(function (key) {
-                    $scope.config.cols[key] = 'raw';
-                });
-                $scope.data = data;
+        worker.onmessage = function (event) {
+            console.log('event from worker')
+            console.log(event)
+            $scope.obfuscatedData = event.data;
+            $scope.keys = Object.keys(event.data[0]);
+        };
+        worker.postMessage({
+            command: 'start',
+            config: $scope.config,
+            file: file
+        });
 
-                $scope.obfuscatedData = Greekr.process($scope.config, data);
-            });
-        }
     }
 
     $scope.dropColumn = function (key) {
@@ -45,7 +46,8 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
     $scope.obfuscate = function () {
         var file = document.querySelector('input[type=file]').files[0];
 
-        var worker = new Worker("worker.js");
+        var worker = new Worker("greekr-worker.js");
+
         worker.onmessage = function (event) {
             alert(event.data);
         };
@@ -59,7 +61,7 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
     window.onload = function () {
         console.log('onload');
         document.getElementById('csv_file').addEventListener("change", previewFile);
-        //        document.getElementById('obfuscate').addEventListener("click", obfuscate);
+//        document.getElementById('obfuscate').addEventListener("click", obfuscate);
     };
 
 

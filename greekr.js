@@ -1,4 +1,4 @@
-window.Greekr = {};
+var Greekr = {};
 
 Greekr.process = function (config, data) {
 
@@ -20,7 +20,7 @@ Greekr.process = function (config, data) {
                     hash = CryptoJS.MD5(hash);
                 }
 
-                newRow[key] = hash.toString(CryptoJS.enc.Hex);
+                newRow[key] = hash.toString(CryptoJS.enc.Hex);                    
                 break;
 
             case "raw":
@@ -28,7 +28,6 @@ Greekr.process = function (config, data) {
                 break;
 
             }
-
 
         }
 
