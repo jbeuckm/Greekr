@@ -14,7 +14,7 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
     });
 
     $scope.$watch('config', function () {
-        //        $scope.obfuscatedData = Greekr.process($scope.config, $scope.data);
+        updatePreview();
     }, true);
 
     function changeFile() {
@@ -26,7 +26,6 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
         readCsvHead(file, 10, function(data){
             $scope.data = data;
             $scope.keys = Object.keys(data[0]);
-            console.log('got keys '+$scope.keys)
             updatePreview(data);
             $scope.$apply();
         });
@@ -37,14 +36,13 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
         var worker = new Worker("greekr-worker.js");
 
         worker.onmessage = function (event) {
-            console.log('event from worker')
-            console.log(event.data)
             $scope.obfuscatedData = event.data.data;
+            $scope.$apply();
         };
         worker.postMessage({
             command: 'obfuscate',
             config: $scope.config,
-            data: data
+            data: $scope.data
         });
 
     }

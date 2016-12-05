@@ -1,5 +1,6 @@
 importScripts('bower_components/papaparse/papaparse.min.js', 'greekr.js');
-
+importScripts('bower_components/cryptojslib/rollups/md5.js');
+importScripts('bower_components/cryptojslib/components/enc-base64-min.js');
 
 self.onmessage = function (msg) {
 

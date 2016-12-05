@@ -50,7 +50,7 @@
                         <button ng-click="dropColumn(key)">drop</button>
                     </td>
                     <td>
-                        <select ng-model="config.cols[key]">
+                        <select ng-model="config.cols[key]" ng-change="changeColConfig()">
                             <option value="drop">drop</option>
                             <option value="raw">raw</option>
                             <option value="hash">hash</option>
@@ -61,6 +61,9 @@
 
                     <td>
                         <span ng-repeat="row in data">
+                            {{row[key]}}
+                        </span>
+                        <span ng-repeat="row in obfuscatedData">
                             {{row[key]}}
                         </span>
                     </td>
