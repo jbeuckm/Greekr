@@ -89,9 +89,9 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
     }
 
 
-    $scope.dropColumn = function (key) {
-        $scope.config.cols[key] = 'drop';
-    }
+    $scope.configColumn = function(key, arg) {
+        $scope.config.cols[key] = arg;
+    };
 
     $scope.obfuscate = function () {
         var file = document.querySelector('input[type=file]').files[0];

@@ -50,15 +50,18 @@
                             <input type="checkbox" ng-model="config.hashColumnName[key]">
                         </td>
                         <td>
-                            <button ng-click="dropColumn(key)">drop</button>
-                        </td>
-                        <td>
-                            <select ng-model="config.cols[key]" ng-change="changeColConfig()">
-                                <option value="drop">drop</option>
-                                <option value="raw">raw</option>
-                                <option value="hash">hash</option>
-                                <option value="linear">linear</option>
-                            </select>
+                            <button ng-click="configColumn(key, 'drop')" ng-disabled="config.cols[key] == 'drop'">
+                                drop
+                            </button>
+                            <button ng-click="configColumn(key, 'raw')" ng-disabled="config.cols[key] == 'raw'">
+                                raw
+                            </button>
+                            <button ng-click="configColumn(key, 'hash')" ng-disabled="config.cols[key] == 'hash'">
+                                hash
+                            </button>
+                            <button ng-click="configColumn(key, 'linear')" ng-disabled="config.cols[key] == 'linear'">
+                                linear
+                            </button>
                         </td>
 
                         <td>
@@ -72,8 +75,7 @@
                         <td>
                             <span>{{processedColumnNames[key]}}</span>
                         </td>
-                        <td>
-                        </td>
+
                         <td>
 
                         </td>
