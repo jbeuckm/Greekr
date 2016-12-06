@@ -24,21 +24,21 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
 
         var file = document.querySelector('input[type=file]').files[0];
 
-        readCsvHead(file, 10, function(data){
+        readCsvHead(file, 10, function (data) {
             $scope.data = data;
             $scope.keys = Object.keys(data[0]);
-            
-            $scope.keys.forEach(function(key){
+
+            $scope.keys.forEach(function (key) {
                 $scope.config.hashColumnName[key] = true;
             });
-            
+
             updatePreview(data);
             $scope.$apply();
         });
     }
-    
+
     function updatePreview(data) {
-        
+
         var worker = new Worker("greekr-worker.js");
 
         worker.onmessage = function (event) {
@@ -89,29 +89,77 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
     }
 
 
-    $scope.configColumn = function(key, arg) {
+    $scope.configColumn = function (key, arg) {
         $scope.config.cols[key] = arg;
     };
 
     $scope.obfuscate = function () {
+
         var file = document.querySelector('input[type=file]').files[0];
 
         var worker = new Worker("greekr-worker.js");
 
         worker.onmessage = function (event) {
-            alert(event.data);
+            console.log(event);
         };
         worker.postMessage({
-            command: 'start',
+            command: 'process_csv',
             config: $scope.config,
             file: file
         });
+
     }
+
+    $scope.saveFileTest = function () {
+        var worker = new Worker("greekr-worker.js");
+
+        worker.onmessage = function (message) {
+
+            console.log(message);
+            
+            switch (message.data.type) {
+            case 'complete':
+                console.log(message.data.url)
+                document.location.href = message.data.url;
+                break;
+
+            case 'error':
+                navigator.webkitTemporaryStorage.queryUsageAndQuota(
+                    function (usedBytes, grantedBytes) {
+                        console.log('we are using ', usedBytes, ' of ', grantedBytes, 'bytes');
+                    },
+                    function (e) {
+                        console.log('Error', e);
+                    }
+                );
+
+
+                var requestedBytes = 1024 * 1024 * 280;
+
+                navigator.webkitPersistentStorage.requestQuota(
+                    requestedBytes,
+                    function (grantedBytes) {
+                        console.log('we were granted ', grantedBytes, 'bytes');
+
+                    },
+                    function (e) {
+                        console.log('Error', e);
+                    }
+                );
+
+                break;
+            }
+
+
+        };
+        worker.postMessage({
+            command: 'test_save_file'
+        });
+    };
 
     window.onload = function () {
         console.log('onload');
         document.getElementById('csv_file').addEventListener("change", changeFile);
     };
-
 
 });

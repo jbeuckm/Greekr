@@ -8,7 +8,7 @@ tr {
     margin-bottom: 0;
 }
 
-tr:nth-child(even) {
+tbody:nth-child(even) {
     background-color: #f2f2f2
 }
 
