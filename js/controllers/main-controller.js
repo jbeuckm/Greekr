@@ -94,16 +94,22 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
     };
 
     $scope.obfuscate = function () {
+        
+        if ($scope.obfuscatingWorker) {
+            $scope.obfuscatingWorker.terminate();
+        }
 
         var file = document.querySelector('input[type=file]').files[0];
 
         var worker = new Worker("greekr-worker.js");
+        $scope.obfuscatingWorker = worker;
 
         worker.onmessage = function (message) {
 
             switch (message.data.type) {
 
             case 'complete':
+                $scope.obfuscatingWorker = null;
                 console.log(message.data.url)
 
                 var modal = document.getElementById('myModal');
@@ -125,9 +131,15 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
                 console.log($scope.obfuscated_csv_name);
                     
                 modal.style.display = "block";
+                
                 $scope.$apply();
 
                 break;
+                    
+            case 'progress':
+                $scope.obfuscateProgress += message.data.rows;
+                $scope.$apply();
+                break;        
 
             case 'error':
                 navigator.webkitTemporaryStorage.queryUsageAndQuota(
@@ -156,6 +168,9 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
                 break;
             }
         };
+        
+        $scope.obfuscateProgress = 0;
+        
         worker.postMessage({
             command: 'process_csv',
             config: $scope.config,

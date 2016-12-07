@@ -86,8 +86,8 @@ function processCSV(file, config) {
             processed = processed.concat(processedChunk.data);
 
             self.postMessage({
-                type: "process_csv",
-                message: 'chunk size ' + chunk.data.length
+                type: "progress",
+                rows: chunk.data.length
             });
         },
         complete: function (results) {
