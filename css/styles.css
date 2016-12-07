@@ -7,13 +7,16 @@ tr {
     margin-top: 0;
     margin-bottom: 0;
 }
-
+tbody {
+    margin-bottom: 5px;
+    border-bottom: 1px solid black; !important
+}
 tbody:nth-child(even) {
     background-color: #f2f2f2
 }
 
 .raw-data {
-    color: #ccc;
+    color: #3a3;
 }
 
 .column-name {
