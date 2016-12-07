@@ -30,6 +30,7 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
 
             $scope.keys.forEach(function (key) {
                 $scope.config.hashColumnName[key] = true;
+                $scope.config.cols[key] = 'drop';
             });
 
             updatePreview(data);
@@ -110,7 +111,6 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
 
             case 'complete':
                 $scope.obfuscatingWorker = null;
-                console.log(message.data.url)
 
                 var modal = document.getElementById('myModal');
                 var span = document.getElementsByClassName("close")[0];
@@ -127,8 +127,6 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
 
                 $scope.obfuscated_csv_path = message.data.url;
                 $scope.obfuscated_csv_name = message.data.url.split('/').pop();
-                console.log($scope.obfuscated_csv_path);
-                console.log($scope.obfuscated_csv_name);
                     
                 modal.style.display = "block";
                 
