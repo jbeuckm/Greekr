@@ -99,25 +99,10 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
 
         var worker = new Worker("greekr-worker.js");
 
-        worker.onmessage = function (event) {
-            console.log(event);
-        };
-        worker.postMessage({
-            command: 'process_csv',
-            config: $scope.config,
-            file: file
-        });
-
-    }
-
-    $scope.saveFileTest = function () {
-        var worker = new Worker("greekr-worker.js");
-
         worker.onmessage = function (message) {
-
-            console.log(message);
             
             switch (message.data.type) {
+            
             case 'complete':
                 console.log(message.data.url)
                 document.location.href = message.data.url;
@@ -149,13 +134,15 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
 
                 break;
             }
-
-
         };
         worker.postMessage({
-            command: 'test_save_file'
+            command: 'process_csv',
+            config: $scope.config,
+            file: file
         });
-    };
+
+    }
+
 
     window.onload = function () {
         console.log('onload');

@@ -19,9 +19,6 @@ self.onmessage = function (msg) {
         processCSV(msg.data.file, msg.data.config);
         break;
 
-    case "test_save_file":
-        saveCsvFile([{"test":true,"number":1}]);
-        break;
     }
 };
 
@@ -35,21 +32,16 @@ function processCSV(file, config) {
         chunk: function (chunk) {
             var processedChunk = Greekr.process(config, chunk.data);
 
-            Array.prototype.push.apply(processed, processedChunk);
+            processed = processed.concat(processedChunk.data);
 
             self.postMessage({
                 type: "process_csv",
                 message: 'chunk size ' + chunk.data.length
             });
         },
-        complete: function (results) {
-
-            var arrayBuffer = new ArrayBuffer();
-
-            self.postMessage({
-                type: "process_csv",
-                rows: processed.length
-            }, [arrayBuffer]);
+        complete: function (results) {            
+            console.log(processed);
+            saveCsvFile(processed);
         }
     });
 }
@@ -116,7 +108,7 @@ function saveCsvFile(data) {
 
         postMessage('Got file system.');
 
-        var fileEntry = fs.root.getFile("test_out.csv", {
+        var fileEntry = fs.root.getFile("test_out2.csv", {
             create: true
         });
 
@@ -129,10 +121,16 @@ function saveCsvFile(data) {
             postMessage('Begin writing');
             fileEntry.createWriter().write(blob);
             postMessage('Writing complete');
-            postMessage({type:'complete',url:fileEntry.toURL()});
+            postMessage({
+                type: 'complete',
+                url: fileEntry.toURL()
+            });
         } catch (e) {
             console.error(e);
-            self.postMessage({type:'error',error:e});
+            self.postMessage({
+                type: 'error',
+                error: e
+            });
         }
 
     } catch (e) {
