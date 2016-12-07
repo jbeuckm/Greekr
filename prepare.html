@@ -22,6 +22,16 @@
 
     <div ng-controller="MainController">
 
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">x</span>
+    <p>Your obfuscated CSV is ready...</p>
+      <a href="{{obfuscated_csv_path}}" download="{{obfuscated_csv_name}}" >download</a>
+  </div>
+
+</div>
         <div class="input-group">
             <label>Salt</label>
             <input type="text" class="form-control" ng-model="config.salt" size="100">

@@ -23,29 +23,6 @@ self.onmessage = function (msg) {
 };
 
 
-function processCSV(file, config) {
-
-    var processed = [];
-
-    Papa.parse(file, {
-        header: true,
-        chunk: function (chunk) {
-            var processedChunk = Greekr.process(config, chunk.data);
-
-            processed = processed.concat(processedChunk.data);
-
-            self.postMessage({
-                type: "process_csv",
-                message: 'chunk size ' + chunk.data.length
-            });
-        },
-        complete: function (results) {            
-            console.log(processed);
-            saveCsvFile(processed);
-        }
-    });
-}
-
 
 function obfuscateData(data, config) {
     var results = Greekr.process(config, data);
@@ -97,8 +74,37 @@ function readCsvHead(file, lines) {
     r.readAsText(file);
 }
 
+function processCSV(file, config) {
 
-function saveCsvFile(data) {
+    var processed = [];
+
+    Papa.parse(file, {
+        header: true,
+        chunk: function (chunk) {
+            var processedChunk = Greekr.process(config, chunk.data);
+
+            processed = processed.concat(processedChunk.data);
+
+            self.postMessage({
+                type: "process_csv",
+                message: 'chunk size ' + chunk.data.length
+            });
+        },
+        complete: function (results) {
+            console.log("will save...")
+            
+            var filename = file.name.split('.');
+            filename.splice(filename.length-1,0,'obfuscated');
+            filename = filename.join('.');
+            
+            console.log(filename)
+            saveCsvFile(processed, filename);
+        }
+    });
+}
+
+
+function saveCsvFile(data, filename) {
 
     self.requestFileSystemSync = self.webkitRequestFileSystemSync ||
         self.requestFileSystemSync;
@@ -108,8 +114,8 @@ function saveCsvFile(data) {
 
         postMessage('Got file system.');
 
-        var fileEntry = fs.root.getFile("test_out2.csv", {
-            create: true
+        var fileEntry = fs.root.getFile(filename, {
+            create:true, exclusive: false
         });
 
         postMessage('Got file entry.');

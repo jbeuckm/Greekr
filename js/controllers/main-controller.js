@@ -100,12 +100,33 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
         var worker = new Worker("greekr-worker.js");
 
         worker.onmessage = function (message) {
-            
+
             switch (message.data.type) {
-            
+
             case 'complete':
                 console.log(message.data.url)
-                document.location.href = message.data.url;
+
+                var modal = document.getElementById('myModal');
+                var span = document.getElementsByClassName("close")[0];
+
+
+                span.onclick = function () {
+                    modal.style.display = "none";
+                }
+                window.onclick = function (event) {
+                    if (event.target == modal) {
+                        modal.style.display = "none";
+                    }
+                }
+
+                $scope.obfuscated_csv_path = message.data.url;
+                $scope.obfuscated_csv_name = message.data.url.split('/').pop();
+                console.log($scope.obfuscated_csv_path);
+                console.log($scope.obfuscated_csv_name);
+                    
+                modal.style.display = "block";
+                $scope.$apply();
+
                 break;
 
             case 'error':
