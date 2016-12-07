@@ -1,6 +1,7 @@
 importScripts('bower_components/papaparse/papaparse.min.js', 'greekr.js');
 importScripts('bower_components/cryptojslib/rollups/md5.js');
 importScripts('bower_components/cryptojslib/components/enc-base64-min.js');
+importScripts('bower_components/comma-separated-values/csv.min.js');
 
 self.onmessage = function (msg) {
 
@@ -19,7 +20,7 @@ self.onmessage = function (msg) {
         break;
 
     case "test_save_file":
-        saveCsvFile(new Blob());
+        saveCsvFile([{"test":true,"number":1}]);
         break;
     }
 };
@@ -121,7 +122,8 @@ function saveCsvFile(data) {
 
         postMessage('Got file entry.');
 
-        var blob = new Blob();
+        var str = new CSV(data, { header: true }).encode();
+        var blob = new Blob([str], {type : 'text/csv'});
 
         try {
             postMessage('Begin writing');
@@ -141,3 +143,5 @@ function saveCsvFile(data) {
     }
 
 }
+
+
