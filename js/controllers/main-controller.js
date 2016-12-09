@@ -1,5 +1,18 @@
-angular.module('greekr').controller('MainController', function ($scope, localCsvService) {
+angular.module('greekr').controller('MainController', function ($scope, localCsvService, $indexedDB) {
 
+    function updateDbCount() {
+        $indexedDB.openStore('hashes', function (store) {
+
+            store.count().then(function (e) {
+    console.log(e);
+                $scope.dbCount = e;
+            });
+        });
+    }
+
+    console.log('updateDbCount()');
+    updateDbCount();
+    
     $scope.config = {
         salt: localStorage.getItem('greekr_salt'),
         rounds: localStorage.getItem('greekr_rounds'),
@@ -95,7 +108,7 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
     };
 
     $scope.obfuscate = function () {
-        
+
         if ($scope.obfuscatingWorker) {
             $scope.obfuscatingWorker.terminate();
         }
@@ -127,17 +140,18 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
 
                 $scope.obfuscated_csv_path = message.data.url;
                 $scope.obfuscated_csv_name = message.data.url.split('/').pop();
-                    
+
                 modal.style.display = "block";
-                
+
                 $scope.$apply();
 
                 break;
-                    
+
             case 'progress':
+                updateDbCount();
                 $scope.obfuscateProgress += message.data.rows;
                 $scope.$apply();
-                break;        
+                break;
 
             case 'error':
                 navigator.webkitTemporaryStorage.queryUsageAndQuota(
@@ -166,9 +180,9 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
                 break;
             }
         };
-        
+
         $scope.obfuscateProgress = 0;
-        
+
         worker.postMessage({
             command: 'process_csv',
             config: $scope.config,

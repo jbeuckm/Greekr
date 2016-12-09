@@ -3,6 +3,39 @@ importScripts('bower_components/cryptojslib/rollups/md5.js');
 importScripts('bower_components/cryptojslib/components/enc-base64-min.js');
 importScripts('bower_components/comma-separated-values/csv.min.js');
 
+
+var db, objectStore;
+
+function initDB(callback) {
+    var request = indexedDB.open("greekr");
+    request.onerror = function (event) {
+        alert("Why didn't you allow my web app to use IndexedDB?!");
+    };
+    request.onsuccess = function (event) {
+        db = event.target.result;
+        callback(db);
+    };
+    request.onupgradeneeded = function (event) {
+        db = event.target.result;
+        objectStore = db.createObjectStore("hashes", {
+            keyPath: "hash"
+        });
+    };
+}
+
+function insertRecord(hash, value) {
+    var transaction = db.transaction(["hashes"], "readwrite");
+    transaction.oncomplete = function (event) {
+        alert("All done!");
+    };
+
+    transaction.onerror = console.log;
+
+    var objectStore = transaction.objectStore("hashes");
+        var request = objectStore.add({ hash: hash, value: value});
+        request.onsuccess = console.log;
+}
+
 self.onmessage = function (msg) {
 
     switch (msg.data.command) {
@@ -25,6 +58,7 @@ self.onmessage = function (msg) {
 
 
 function obfuscateData(data, config) {
+    if (!data) return;
     var results = Greekr.process(config, data);
     self.postMessage({
         type: 'obfuscate',
@@ -78,6 +112,10 @@ function processCSV(file, config) {
 
     var processed = [];
 
+    initDB(function(){
+        insertRecord('testHash','testValue');        
+    });
+    
     Papa.parse(file, {
         header: true,
         chunk: function (chunk) {
@@ -92,11 +130,11 @@ function processCSV(file, config) {
         },
         complete: function (results) {
             console.log("will save...")
-            
+
             var filename = file.name.split('.');
-            filename.splice(filename.length-1,0,'obfuscated');
+            filename.splice(filename.length - 1, 0, 'obfuscated');
             filename = filename.join('.');
-            
+
             console.log(filename)
             saveCsvFile(processed, filename);
         }
@@ -108,20 +146,25 @@ function saveCsvFile(data, filename) {
 
     self.requestFileSystemSync = self.webkitRequestFileSystemSync ||
         self.requestFileSystemSync;
-    
+
     try {
         var fs = requestFileSystemSync(TEMPORARY, 1024 * 1024 /*1MB*/ );
 
         postMessage('Got file system.');
 
         var fileEntry = fs.root.getFile(filename, {
-            create:true, exclusive: false
+            create: true,
+            exclusive: false
         });
 
         postMessage('Got file entry.');
 
-        var str = new CSV(data, { header: true }).encode();
-        var blob = new Blob([str], {type : 'text/csv'});
+        var str = new CSV(data, {
+            header: true
+        }).encode();
+        var blob = new Blob([str], {
+            type: 'text/csv'
+        });
 
         try {
             postMessage('Begin writing');
@@ -142,10 +185,11 @@ function saveCsvFile(data, filename) {
     } catch (e) {
         console.log(e);
         console.error(e);
-        
-        self.postMessage({type:'error',error:e});
+
+        self.postMessage({
+            type: 'error',
+            error: e
+        });
     }
 
 }
-
-
