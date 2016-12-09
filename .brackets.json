@@ -1,5 +1,6 @@
 {
     "jscodehints.detectedExclusions": [
-        "/Users/jpbeuc1/Documents/greekr/bower_components/cryptojslib/rollups/hmac-md5.js"
+        "/Users/jpbeuc1/Documents/greekr/bower_components/cryptojslib/rollups/hmac-md5.js",
+        "/Users/jpbeuc1/Documents/greekr/bower_components/cryptojslib/components/tripledes.js"
     ]
 }

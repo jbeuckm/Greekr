@@ -14,6 +14,7 @@ function initDB(callback) {
         callback(db);
     };
     request.onupgradeneeded = function (event) {
+        console.log('onupgradeneeded');
         db = event.target.result;
         objectStore = db.createObjectStore("hashes", {
             keyPath: "hash"
@@ -36,7 +37,10 @@ function insertRecord(hash, value) {
 
 Greekr.process = function (config, data, callback) {
     console.log('process')
-    if (!data) return;
+    if (!data) {
+        console.log('no data');
+        return;
+    }
     initDB(function(){
         console.log('db initted');
         var result = executeObfuscation(config, data);

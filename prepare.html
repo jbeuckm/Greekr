@@ -13,7 +13,6 @@
     <script src="js/prepare-app.js"></script>
     <script src="js/services/local-csv-service.js"></script>
     <script src="js/controllers/main-controller.js"></script>
-    <script src="bower_components/angular-indexed-db/angular-indexed-db.min.js"></script>
 
     <script src="bower_components/cryptojslib/rollups/md5.js"></script>
     <script src="bower_components/cryptojslib/components/enc-base64-min.js"></script>
@@ -25,6 +24,8 @@
     <div ng-controller="MainController">
         
         <div>Hash database has {{ dbCount }} records.</div>
+        
+        <button ng-click="clearDb()">Clear Database</button>
 
 <div id="myModal" class="modal">
 
@@ -84,7 +85,7 @@
                         </td>
 
                         <td>
-                            <span class="raw-data" ng-repeat="row in data">
+                            <span class="raw-data" ng-repeat="row in previewData">
                                 {{row[key]}}
                             </span>
                         </td>

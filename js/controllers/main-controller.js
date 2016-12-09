@@ -1,6 +1,47 @@
-angular.module('greekr').controller('MainController', function ($scope, localCsvService, $indexedDB) {
+angular.module('greekr').controller('MainController', function ($scope, localCsvService) {
+
+var db;
+var request = indexedDB.open("greekr");
+request.onerror = function(event) {
+  alert("Why didn't you allow my web app to use IndexedDB?!");
+};
+request.onsuccess = function(event) {
+  db = event.target.result;
+    updateDbCount();
+    
+};
+    
+    $scope.clearDb = function () {
+        console.log('clearDb()');
+/*        
+        $indexedDB.openStore('hashes', function (objectStore) {
+            console.log('opened store hashes');
+
+            var objectStoreRequest = objectStore.clear();
+
+            objectStoreRequest.onsuccess = function (event) {
+                updateDbCount();
+            };
+
+        });
+*/        
+    }
 
     function updateDbCount() {
+        console.log('updateDbCount()');
+        
+var transaction = db.transaction(["hashes"]);
+var objectStore = transaction.objectStore("hashes");
+var request = objectStore.count();
+request.onerror = console.log;
+request.onsuccess = function(event) {
+  console.log("counted");
+  console.log(event.target.result);
+                $scope.dbCount = event.target.result;
+    $scope.$apply();
+};
+        
+/*        
         $indexedDB.openStore('hashes', function (store) {
 
             console.log('opened store hashes');
@@ -8,11 +49,10 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
                 $scope.dbCount = e;
             });
         });
+*/
     }
 
-    console.log('updateDbCount()');
-    updateDbCount();
-    
+
     $scope.config = {
         salt: localStorage.getItem('greekr_salt'),
         rounds: localStorage.getItem('greekr_rounds'),
@@ -61,7 +101,7 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
             $scope.processedColumnNames = event.data.processedColumnNames;
             $scope.$apply();
         };
-        
+
         var previewConfig = JSON.parse(JSON.stringify($scope.config));
         previewConfig.skipDatabase = true;
         worker.postMessage({
@@ -153,6 +193,7 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
             case 'progress':
                 updateDbCount();
                 $scope.obfuscateProgress += message.data.rows;
+                updateDbCount();
                 $scope.$apply();
                 break;
 
