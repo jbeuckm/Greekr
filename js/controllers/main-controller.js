@@ -3,8 +3,8 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
     function updateDbCount() {
         $indexedDB.openStore('hashes', function (store) {
 
+            console.log('opened store hashes');
             store.count().then(function (e) {
-    console.log(e);
                 $scope.dbCount = e;
             });
         });
@@ -38,7 +38,7 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
         var file = document.querySelector('input[type=file]').files[0];
 
         readCsvHead(file, 10, function (data) {
-            $scope.data = data;
+            $scope.previewData = data;
             $scope.keys = Object.keys(data[0]);
 
             $scope.keys.forEach(function (key) {
@@ -61,10 +61,13 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
             $scope.processedColumnNames = event.data.processedColumnNames;
             $scope.$apply();
         };
+        
+        var previewConfig = JSON.parse(JSON.stringify($scope.config));
+        previewConfig.skipDatabase = true;
         worker.postMessage({
             command: 'obfuscate',
-            config: $scope.config,
-            data: $scope.data
+            config: previewConfig,
+            data: $scope.previewData
         });
 
     }

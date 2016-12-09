@@ -1,9 +1,51 @@
 var Greekr = {};
 
-Greekr.process = function (config, data) {
+var db, objectStore;
 
-    if (!data) return;
+function initDB(callback) {
     
+    if (db) {
+        return callback(db);
+    }
+    var request = indexedDB.open("greekr");
+    request.onerror = console.error;
+    request.onsuccess = function (event) {
+        db = event.target.result;
+        callback(db);
+    };
+    request.onupgradeneeded = function (event) {
+        db = event.target.result;
+        objectStore = db.createObjectStore("hashes", {
+            keyPath: "hash"
+        });
+    };
+}
+
+function insertRecord(hash, value) {
+    var transaction = db.transaction(["hashes"], "readwrite");
+    transaction.oncomplete = function (event) {
+        console.log("transaction.oncomplete");
+    };
+
+    transaction.onerror = console.log;
+
+    var objectStore = transaction.objectStore("hashes");
+        var request = objectStore.add({ hash: hash, value: value});
+        request.onsuccess = console.log;
+}
+
+Greekr.process = function (config, data, callback) {
+    console.log('process')
+    if (!data) return;
+    initDB(function(){
+        console.log('db initted');
+        var result = executeObfuscation(config, data);
+        callback(result);
+    });
+}
+    
+function executeObfuscation(config, data) {    
+    console.log('executeObfuscation');
     var processedColumnNames = {};
     Object.keys(data[0]).forEach(function(key){
         
@@ -38,7 +80,13 @@ Greekr.process = function (config, data) {
                     hash = CryptoJS.MD5(hash);
                 }
 
-                newRow[processedColumnNames[key]] = hash.toString(CryptoJS.enc.Hex);                    
+                    var hashString = hash.toString(CryptoJS.enc.Hex);
+                newRow[processedColumnNames[key]] = hashString;
+                    
+                if (!config.skipDatabase) {
+                    insertRecord(hashString, row[key]);
+                }
+                    
                 break;
 
             case "raw":

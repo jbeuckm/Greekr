@@ -4,38 +4,6 @@ importScripts('bower_components/cryptojslib/components/enc-base64-min.js');
 importScripts('bower_components/comma-separated-values/csv.min.js');
 
 
-var db, objectStore;
-
-function initDB(callback) {
-    var request = indexedDB.open("greekr");
-    request.onerror = function (event) {
-        alert("Why didn't you allow my web app to use IndexedDB?!");
-    };
-    request.onsuccess = function (event) {
-        db = event.target.result;
-        callback(db);
-    };
-    request.onupgradeneeded = function (event) {
-        db = event.target.result;
-        objectStore = db.createObjectStore("hashes", {
-            keyPath: "hash"
-        });
-    };
-}
-
-function insertRecord(hash, value) {
-    var transaction = db.transaction(["hashes"], "readwrite");
-    transaction.oncomplete = function (event) {
-        alert("All done!");
-    };
-
-    transaction.onerror = console.log;
-
-    var objectStore = transaction.objectStore("hashes");
-        var request = objectStore.add({ hash: hash, value: value});
-        request.onsuccess = console.log;
-}
-
 self.onmessage = function (msg) {
 
     switch (msg.data.command) {
@@ -59,11 +27,13 @@ self.onmessage = function (msg) {
 
 function obfuscateData(data, config) {
     if (!data) return;
-    var results = Greekr.process(config, data);
-    self.postMessage({
-        type: 'obfuscate',
-        data: results.data,
-        processedColumnNames: results.processedColumnNames
+    Greekr.process(config, data, function (results) {
+
+        self.postMessage({
+            type: 'obfuscate',
+            data: results.data,
+            processedColumnNames: results.processedColumnNames
+        });
     });
 }
 
@@ -112,21 +82,23 @@ function processCSV(file, config) {
 
     var processed = [];
 
-    initDB(function(){
-        insertRecord('testHash','testValue');        
+    initDB(function () {
+        insertRecord('testHash', 'testValue');
     });
-    
+
     Papa.parse(file, {
         header: true,
         chunk: function (chunk) {
-            var processedChunk = Greekr.process(config, chunk.data);
+            Greekr.process(config, chunk.data, function (processedChunk) {
 
-            processed = processed.concat(processedChunk.data);
+                processed = processed.concat(processedChunk.data);
 
-            self.postMessage({
-                type: "progress",
-                rows: chunk.data.length
+                self.postMessage({
+                    type: "progress",
+                    rows: chunk.data.length
+                });
             });
+
         },
         complete: function (results) {
             console.log("will save...")
