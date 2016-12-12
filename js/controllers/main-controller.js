@@ -208,6 +208,13 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
                 updateDbCount();
                 break;
 
+
+            case 'obfuscate_progress':
+                console.log('obfuscate_progress event');
+                updateDbCount();
+                break;
+
+
             case 'error':
                 navigator.webkitTemporaryStorage.queryUsageAndQuota(
                     function (usedBytes, grantedBytes) {
@@ -242,10 +249,11 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
             config: $scope.config,
             file: file
         });
-
+/*
         window.onunload = function() {
             worker.terminate();
         };
+*/        
     }
 
 

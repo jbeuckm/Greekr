@@ -32,43 +32,46 @@ var queuedRecords = [];
 var transaction;
 
 function queueRecord(hash, value, progressCallback) {
-    
+
     queuedRecords.push({
         hash: hash,
         value: value
     });
-                       
+
     nextRecord(progressCallback);
 }
-                       
+
 function nextRecord(progressCallback) {
-        
+
     if (transaction != null) return;
-        
+
     if (queuedRecords.length == 0) return;
-        
+
     transaction = db.transaction("hashes", "readwrite");
 
     transaction.oncomplete = function (event) {
         transaction = null;
-        nextRecord();
+        if (progressCallback) {
+            progressCallback('complete');
+        }
+        nextRecord(progressCallback);
     };
-        
+
     transaction.onerror = function (event) {
         console.error(event);
-        nextRecord();
+        if (progressCallback) {
+            progressCallback('error');
+        }
+        nextRecord(progressCallback);
     };
 
     var record = queuedRecords.shift();
     var request = transaction.objectStore("hashes").put(record);
 
-    if (progressCallback) {
-        progressCallback();
-    }
 }
 
 
-Greekr.process = function (config, data, callback) {
+Greekr.process = function (config, data, callback, progressCallback) {
     console.log('process')
     if (!data) {
         console.log('no data');
@@ -76,12 +79,12 @@ Greekr.process = function (config, data, callback) {
     }
     initDB(function () {
         console.log('db initted');
-        var result = executeObfuscation(config, data);
+        var result = executeObfuscation(config, data, progressCallback);
         callback(result);
     });
 }
 
-function executeObfuscation(config, data) {
+function executeObfuscation(config, data, progressCallback) {
     console.log('executeObfuscation');
     var processedColumnNames = {};
     Object.keys(data[0]).forEach(function (key) {
@@ -121,7 +124,7 @@ function executeObfuscation(config, data) {
                 newRow[processedColumnNames[key]] = hashString;
 
                 if (!config.skipDatabase) {
-                    queueRecord(hashString, row[key]);
+                    queueRecord(hashString, row[key], progressCallback);
                 }
 
                 break;

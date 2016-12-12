@@ -28,16 +28,23 @@ console.log = self.postMessage;
 console.error = self.postMessage;
 */
 
+function handleObfuscateResults(results){
+    self.postMessage({
+        type: 'obfuscate',
+        data: results.data,
+        processedColumnNames: results.processedColumnNames
+    });
+}
+
+function handleObfuscateProgress(report){
+    self.postMessage({
+        type: 'obfuscate_progress'
+    });
+}
+
 function obfuscateData(data, config) {
     if (!data) return;
-    Greekr.process(config, data, function (results) {
-
-        self.postMessage({
-            type: 'obfuscate',
-            data: results.data,
-            processedColumnNames: results.processedColumnNames
-        });
-    });
+    Greekr.process(config, data, handleObfuscateResults, handleObfuscateProgress);
 }
 
 
@@ -108,7 +115,8 @@ function processCSV(file, config) {
 
             console.log(filename)
             saveCsvFile(processed, filename);
-        }
+        },
+        worker: true
     });
 }
 
