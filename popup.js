@@ -5,11 +5,17 @@ function openPrepareTab() {
     });
 }
 
+function unhashPage() {
+    
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     
     var prepareButton = document.getElementById('prepare-data');
-    console.log(prepareButton);
     prepareButton.addEventListener('click', openPrepareTab);
+    
+    var unhashButton = document.getElementById('unhash-page');
+    unhashButton.addEventListener('click', unhashPage);
 
 });
 

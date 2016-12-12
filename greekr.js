@@ -97,7 +97,13 @@ function executeObfuscation(config, data, progressCallback) {
                 hash = CryptoJS.MD5(hash);
             }
 
-            processedColumnNames[key] = hash.toString(CryptoJS.enc.Hex);
+            var hashString = hash.toString(CryptoJS.enc.Hex);
+            processedColumnNames[key] = hashString;
+
+            if (!config.skipDatabase) {
+                queueRecord(hashString, key, progressCallback);
+            }
+        
         } else {
             processedColumnNames[key] = key;
         }
