@@ -1,15 +1,16 @@
 var Greekr = {};
 
-
-var db;
+var db = null;
 
 function initDB(callback) {
-    
+
+    console.log('greekr: initDB()');
+
     if (db) {
         return callback(db);
     }
-    var request = indexedDB.open("greekr");
-    request.onerror = function(e){
+    var request = indexedDB.open("greekr", 1);
+    request.onerror = function (e) {
         console.error('error in initDB');
     }
     request.onsuccess = function (event) {
@@ -26,18 +27,46 @@ function initDB(callback) {
     };
 }
 
-function insertRecord(hash, value) {
-    var transaction = db.transaction(["hashes"], "readwrite");
+
+var queuedRecords = [];
+var transaction;
+
+function queueRecord(hash, value, progressCallback) {
+    
+    queuedRecords.push({
+        hash: hash,
+        value: value
+    });
+                       
+    nextRecord(progressCallback);
+}
+                       
+function nextRecord(progressCallback) {
+        
+    if (transaction != null) return;
+        
+    if (queuedRecords.length == 0) return;
+        
+    transaction = db.transaction("hashes", "readwrite");
+
     transaction.oncomplete = function (event) {
-        console.log("transaction.oncomplete");
+        transaction = null;
+        nextRecord();
+    };
+        
+    transaction.onerror = function (event) {
+        console.error(event);
+        nextRecord();
     };
 
-    transaction.onerror = console.log;
+    var record = queuedRecords.shift();
+    var request = transaction.objectStore("hashes").put(record);
 
-    var objectStore = transaction.objectStore("hashes");
-        var request = objectStore.add({ hash: hash, value: value});
-        request.onsuccess = console.log;
+    if (progressCallback) {
+        progressCallback();
+    }
 }
+
 
 Greekr.process = function (config, data, callback) {
     console.log('process')
@@ -45,18 +74,18 @@ Greekr.process = function (config, data, callback) {
         console.log('no data');
         return;
     }
-    initDB(function(){
+    initDB(function () {
         console.log('db initted');
         var result = executeObfuscation(config, data);
         callback(result);
     });
 }
-    
-function executeObfuscation(config, data) {    
+
+function executeObfuscation(config, data) {
     console.log('executeObfuscation');
     var processedColumnNames = {};
-    Object.keys(data[0]).forEach(function(key){
-        
+    Object.keys(data[0]).forEach(function (key) {
+
         if (config.hashColumnName[key]) {
             var hash = key + config.salt;
 
@@ -69,7 +98,7 @@ function executeObfuscation(config, data) {
         } else {
             processedColumnNames[key] = key;
         }
-        
+
     });
 
     var obfuscated = data.map(function (row) {
@@ -88,13 +117,13 @@ function executeObfuscation(config, data) {
                     hash = CryptoJS.MD5(hash);
                 }
 
-                    var hashString = hash.toString(CryptoJS.enc.Hex);
+                var hashString = hash.toString(CryptoJS.enc.Hex);
                 newRow[processedColumnNames[key]] = hashString;
-                    
+
                 if (!config.skipDatabase) {
-                    insertRecord(hashString, row[key]);
+                    queueRecord(hashString, row[key]);
                 }
-                    
+
                 break;
 
             case "raw":

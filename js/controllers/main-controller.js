@@ -1,21 +1,26 @@
 angular.module('greekr').controller('MainController', function ($scope, localCsvService) {
 
     
-    var db;
+    var db = null;
 
     function initDB() {
-
-        console.log("initDB() ");
         
-        var request = indexedDB.open("greekr");
-        request.onerror = function (event) {
-            console.log("Failed to authorize indexedDB");
-        };
+        console.log("MainController: initDB() ");
+            
+        var request = indexedDB.open("greekr", 1);
+        
         request.onsuccess = function (event) {
-            console.log('initDB worked');
+            console.log('initDB success');
             db = request.result;
             updateDbCount();
+        };
 
+        request.onblocked = function(e) {
+          console.log("DB open blocked", e);
+        };
+        
+        request.onerror = function (event) {
+            console.log("Failed to authorize indexedDB");
         };
         request.onupgradeneeded = function (event) {
             console.log('onupgradeneeded');
@@ -24,16 +29,21 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
                 keyPath: "hash"
             });
         };
+       
+        console.log("initDB ran");
     }
 
     $scope.clearDb = function () {
         console.log('clearDb()');
-        var transaction = db.transaction(["hashes"], "readwrite");
+        
+        var transaction = db.transaction("hashes", "readwrite");
         var objectStore = transaction.objectStore("hashes");
         var request = objectStore.clear();
-        request.onerror = console.log;
+        request.onerror = function(e) {
+            console.log(e);
+        };
         request.onsuccess = function (event) {
-            console.log("cleared");
+            console.log("db cleared");
             updateDbCount();
         };
     }
@@ -41,13 +51,14 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
     function updateDbCount() {
         console.log('updateDbCount()');
 
-        var transaction = db.transaction(["hashes"]);
+        var transaction = db.transaction("hashes", "readonly");
         var objectStore = transaction.objectStore("hashes");
         var request = objectStore.count();
-        request.onerror = console.log;
+        request.onerror = function(e) {
+            console.log(e);
+        };
         request.onsuccess = function (event) {
-            console.log("counted");
-            console.log(event.target.result);
+            console.log("counted: "+event.target.result);
             $scope.dbCount = event.target.result;
             $scope.$apply();
         };
@@ -206,7 +217,6 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
                         console.log('Error', e);
                     }
                 );
-
 
                 var requestedBytes = 1024 * 1024 * 280;
 

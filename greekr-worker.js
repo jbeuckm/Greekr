@@ -23,7 +23,10 @@ self.onmessage = function (msg) {
     }
 };
 
-
+/*
+console.log = self.postMessage;
+console.error = self.postMessage;
+*/
 
 function obfuscateData(data, config) {
     if (!data) return;
@@ -81,10 +84,6 @@ function readCsvHead(file, lines) {
 function processCSV(file, config) {
 
     var processed = [];
-
-    initDB(function () {
-        insertRecord('testHash', 'testValue');
-    });
 
     Papa.parse(file, {
         header: true,
