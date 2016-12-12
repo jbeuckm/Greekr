@@ -1,55 +1,57 @@
 angular.module('greekr').controller('MainController', function ($scope, localCsvService) {
 
-var db;
-var request = indexedDB.open("greekr");
-request.onerror = function(event) {
-  alert("Why didn't you allow my web app to use IndexedDB?!");
-};
-request.onsuccess = function(event) {
-  db = event.target.result;
-    updateDbCount();
     
-};
-    
+    var db;
+
+    function initDB() {
+
+        console.log("initDB() ");
+        
+        var request = indexedDB.open("greekr");
+        request.onerror = function (event) {
+            console.log("Failed to authorize indexedDB");
+        };
+        request.onsuccess = function (event) {
+            console.log('initDB worked');
+            db = request.result;
+            updateDbCount();
+
+        };
+        request.onupgradeneeded = function (event) {
+            console.log('onupgradeneeded');
+            db = event.target.result;
+            var objectStore = db.createObjectStore("hashes", {
+                keyPath: "hash"
+            });
+        };
+    }
+
     $scope.clearDb = function () {
         console.log('clearDb()');
-/*        
-        $indexedDB.openStore('hashes', function (objectStore) {
-            console.log('opened store hashes');
-
-            var objectStoreRequest = objectStore.clear();
-
-            objectStoreRequest.onsuccess = function (event) {
-                updateDbCount();
-            };
-
-        });
-*/        
+        var transaction = db.transaction(["hashes"], "readwrite");
+        var objectStore = transaction.objectStore("hashes");
+        var request = objectStore.clear();
+        request.onerror = console.log;
+        request.onsuccess = function (event) {
+            console.log("cleared");
+            updateDbCount();
+        };
     }
 
     function updateDbCount() {
         console.log('updateDbCount()');
-        
-var transaction = db.transaction(["hashes"]);
-var objectStore = transaction.objectStore("hashes");
-var request = objectStore.count();
-request.onerror = console.log;
-request.onsuccess = function(event) {
-  console.log("counted");
-  console.log(event.target.result);
-                $scope.dbCount = event.target.result;
-    $scope.$apply();
-};
-        
-/*        
-        $indexedDB.openStore('hashes', function (store) {
 
-            console.log('opened store hashes');
-            store.count().then(function (e) {
-                $scope.dbCount = e;
-            });
-        });
-*/
+        var transaction = db.transaction(["hashes"]);
+        var objectStore = transaction.objectStore("hashes");
+        var request = objectStore.count();
+        request.onerror = console.log;
+        request.onsuccess = function (event) {
+            console.log("counted");
+            console.log(event.target.result);
+            $scope.dbCount = event.target.result;
+            $scope.$apply();
+        };
+
     }
 
 
@@ -191,10 +193,8 @@ request.onsuccess = function(event) {
                 break;
 
             case 'progress':
-                updateDbCount();
                 $scope.obfuscateProgress += message.data.rows;
                 updateDbCount();
-                $scope.$apply();
                 break;
 
             case 'error':
@@ -233,12 +233,17 @@ request.onsuccess = function(event) {
             file: file
         });
 
+        window.onunload = function() {
+            worker.terminate();
+        };
     }
 
 
     window.onload = function () {
         console.log('onload');
         document.getElementById('csv_file').addEventListener("change", changeFile);
+
+        initDB();
     };
 
 });

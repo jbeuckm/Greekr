@@ -1,6 +1,7 @@
 var Greekr = {};
 
-var db, objectStore;
+
+var db;
 
 function initDB(callback) {
     
@@ -8,15 +9,18 @@ function initDB(callback) {
         return callback(db);
     }
     var request = indexedDB.open("greekr");
-    request.onerror = console.error;
+    request.onerror = function(e){
+        console.error('error in initDB');
+    }
     request.onsuccess = function (event) {
-        db = event.target.result;
+        console.log('initDB success');
+        db = request.result;
         callback(db);
     };
     request.onupgradeneeded = function (event) {
         console.log('onupgradeneeded');
         db = event.target.result;
-        objectStore = db.createObjectStore("hashes", {
+        var objectStore = db.createObjectStore("hashes", {
             keyPath: "hash"
         });
     };
