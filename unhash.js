@@ -1,27 +1,45 @@
+// This runs in the context of the webpage to unhash
+
 var hashRegexp = /([a-f0-9]{32})/i;
 
 
-var all = getElementsWithNoChildren().filter(function(el){
+var all = getElementsWithNoChildren().filter(function (el) {
     return (el.offsetParent !== null);
 });
 
-for (var i=0, max=all.length; i < max; i++) {
+console.log("will search " + all.length + " elements");
+
+for (var i = 0, max = all.length; i < max; i++) {
     var el = all[i];
-    console.log(el.innerHTML);
+
     if (el.innerHTML.match(hashRegexp)) {
-        alert(el.innerHTML)
+        attemptUnhash(el);
     }
-    el.innerHTML = el.textContent.replace(hashRegexp, '<b class="replaced">$1<\/b>');
+}
+
+var ExtensionId = "cbjpopohmpnpenplajjnnlgenodmieho";
+
+
+function attemptUnhash(el) {
+    var hash = el.textContent;
+    console.log('unhashing ' + hash);
+
+    /*
+    Greekr.unhash(el.textContent, function (result) {
+        el.innerHTML = '<span class="replaced">' + result + '<\/span>';
+    });
+*/
+
+    chrome.runtime.sendMessage(ExtensionId, { hash: hash }, {},
+        function (result) {
+            el.innerHTML = '<span class="replaced">' + result + '<\/span>';
+        }
+    );
+
 }
 
 
-
-
-
 function getElementsWithNoChildren(data) {
-
-    // This function is designed to find the most bottom level
-    // elements in the DOM tree, anything without children
 
     var candidates, numberOfChildren, i, len, result = [];
 
@@ -31,18 +49,15 @@ function getElementsWithNoChildren(data) {
             if (data.length > 0) {
                 // looks like an array, so assume it contains elements...
                 candidates = data;
-            }
-            else {
+            } else {
                 // looks like an empty array, so return the default result...
                 return result;
             }
-        }
-        else {
+        } else {
             // It's an object, but not array-like, so assume it's an element...
             candidates = data.querySelectorAll('*');
         }
-    }
-    else {
+    } else {
         // Default if no arguments or weird ones are passed in...
         candidates = window.document.querySelectorAll('*');
     }

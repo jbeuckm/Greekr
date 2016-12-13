@@ -7,6 +7,13 @@ function openPrepareTab() {
 
 function unhashPage() {
     
+  chrome.tabs.executeScript({
+    file: 'greekr.js'
+  });
+  chrome.tabs.executeScript({
+    file: 'unhash.js'
+  });
+
 }
 
 document.addEventListener('DOMContentLoaded', function () {

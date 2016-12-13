@@ -5,10 +5,27 @@
     "permissions": [
     "activeTab"
   ],
+
+    "externally_connectable": {
+        "matches": [
+            "https://studio.azureml.net/*"
+        ]
+    },
+
+
     "background": {
         "scripts": ["js/background.js"],
-        "persistent": false
+        "persistent": true
     },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://studio.azureml.net/*"
+            ],
+            "css": [],
+            "js": ["greekr.js"]
+    }
+  ],
     "browser_action": {
         "default_icon": "icon.png",
         "default_title": "Reverse hashes on this page",

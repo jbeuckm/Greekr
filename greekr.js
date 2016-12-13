@@ -1,5 +1,5 @@
 var Greekr = {};
-
+console.log("Using Greekr");
 var db = null;
 
 function initDB(callback) {
@@ -26,6 +26,27 @@ function initDB(callback) {
         });
     };
 }
+
+
+Greekr.unhash = function (hash, callback) {
+
+    initDB(function (db) {
+        var tx = db.transaction("hashes", "readwrite");
+
+        tx.oncomplete = console.log;
+        tx.onerror = console.error;
+        
+        console.log("lookup "+hash);
+        
+
+        var request = tx.objectStore("hashes").get(hash);
+        request.onerror = console.error;
+        request.onsuccess = function (event) {
+            console.log(event);
+            callback(request.result.value);
+        };
+    })
+};
 
 
 var queuedRecords = [];
@@ -103,7 +124,7 @@ function executeObfuscation(config, data, progressCallback) {
             if (!config.skipDatabase) {
                 queueRecord(hashString, key, progressCallback);
             }
-        
+
         } else {
             processedColumnNames[key] = key;
         }
