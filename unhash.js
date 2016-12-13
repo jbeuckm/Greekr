@@ -22,17 +22,11 @@ var ExtensionId = "cbjpopohmpnpenplajjnnlgenodmieho";
 
 function attemptUnhash(el) {
     var hash = el.textContent;
-    console.log('unhashing ' + hash);
-
-    /*
-    Greekr.unhash(el.textContent, function (result) {
-        el.innerHTML = '<span class="replaced">' + result + '<\/span>';
-    });
-*/
 
     chrome.runtime.sendMessage(ExtensionId, { hash: hash }, {},
         function (result) {
-            el.innerHTML = '<span class="replaced">' + result + '<\/span>';
+            console.log("unhash received decoded value "+result);
+//            el.innerHTML = '<span class="replaced">' + result + '<\/span>';
         }
     );
 

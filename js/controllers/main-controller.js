@@ -1,68 +1,23 @@
 angular.module('greekr').controller('MainController', function ($scope, localCsvService) {
 
-    
-    var db = null;
-
-    function initDB() {
-        
-        console.log("MainController: initDB() ");
-            
-        var request = indexedDB.open("greekr", 1);
-        
-        request.onsuccess = function (event) {
-            console.log('initDB success');
-            db = request.result;
-            updateDbCount();
-        };
-
-        request.onblocked = function(e) {
-          console.log("DB open blocked", e);
-        };
-        
-        request.onerror = function (event) {
-            console.log("Failed to authorize indexedDB");
-        };
-        request.onupgradeneeded = function (event) {
-            console.log('onupgradeneeded');
-            db = event.target.result;
-            var objectStore = db.createObjectStore("hashes", {
-                keyPath: "hash"
-            });
-        };
-       
-        console.log("initDB ran");
-    }
-
     $scope.clearDb = function () {
-        console.log('clearDb()');
-        
-        var transaction = db.transaction("hashes", "readwrite");
-        var objectStore = transaction.objectStore("hashes");
-        var request = objectStore.clear();
-        request.onerror = function(e) {
-            console.log(e);
-        };
-        request.onsuccess = function (event) {
-            console.log("db cleared");
-            updateDbCount();
-        };
+        chrome.runtime.sendMessage(
+            { type: 'clear_db' }, 
+            function(response){
+                console.log(response);
+            }
+        );
     }
 
     function updateDbCount() {
         console.log('updateDbCount()');
-
-        var transaction = db.transaction("hashes", "readonly");
-        var objectStore = transaction.objectStore("hashes");
-        var request = objectStore.count();
-        request.onerror = function(e) {
-            console.log(e);
-        };
-        request.onsuccess = function (event) {
-            console.log("counted: "+event.target.result);
-            $scope.dbCount = event.target.result;
-            $scope.$apply();
-        };
-
+        chrome.runtime.sendMessage(
+            { type: 'count_records' }, 
+            function(response){
+                $scope.dbCount = response;
+                $scope.$apply();
+            }
+        );
     }
 
 
@@ -260,8 +215,7 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
     window.onload = function () {
         console.log('onload');
         document.getElementById('csv_file').addEventListener("change", changeFile);
-
-        initDB();
+        updateDbCount();
     };
 
 });

@@ -1,54 +1,25 @@
 var Greekr = {};
 console.log("Using Greekr");
-var db = null;
 
-function initDB(callback) {
-
-    console.log('greekr: initDB()');
-
-    if (db) {
-        return callback(db);
-    }
-    var request = indexedDB.open("greekr", 1);
-    request.onerror = function (e) {
-        console.error('error in initDB');
-    }
-    request.onsuccess = function (event) {
-        console.log('initDB success');
-        db = request.result;
-        callback(db);
-    };
-    request.onupgradeneeded = function (event) {
-        console.log('onupgradeneeded');
-        db = event.target.result;
-        var objectStore = db.createObjectStore("hashes", {
-            keyPath: "hash"
-        });
-    };
-}
-
+var ExtensionId = "cbjpopohmpnpenplajjnnlgenodmieho";
 
 Greekr.unhash = function (hash, callback) {
 
-    initDB(function (db) {
-        var tx = db.transaction("hashes", "readwrite");
-
-        tx.oncomplete = console.log;
-        tx.onerror = console.error;
-        
-        console.log("lookup "+hash);
-        
-
-        var request = tx.objectStore("hashes").get(hash);
-        request.onerror = console.error;
-        request.onsuccess = function (event) {
-            console.log(event);
-            callback(request.result.value);
-        };
-    })
+    chrome.runtime.sendMessage(
+        ExtensionId, 
+        { 
+            type: "retrieve_value", 
+            hash: hash
+        }, {},
+        function(response) {
+            console.log('response:');
+            console.log(response);
+        }
+    );
+    
 };
 
-
+/*
 var queuedRecords = [];
 var transaction;
 
@@ -90,7 +61,7 @@ function nextRecord(progressCallback) {
     var request = transaction.objectStore("hashes").put(record);
 
 }
-
+*/
 
 Greekr.process = function (config, data, callback, progressCallback) {
     console.log('process')
@@ -98,11 +69,10 @@ Greekr.process = function (config, data, callback, progressCallback) {
         console.log('no data');
         return;
     }
-    initDB(function () {
-        console.log('db initted');
+//    initDB(function () {
         var result = executeObfuscation(config, data, progressCallback);
         callback(result);
-    });
+//    });
 }
 
 function executeObfuscation(config, data, progressCallback) {
@@ -120,11 +90,11 @@ function executeObfuscation(config, data, progressCallback) {
 
             var hashString = hash.toString(CryptoJS.enc.Hex);
             processedColumnNames[key] = hashString;
-
+/*
             if (!config.skipDatabase) {
                 queueRecord(hashString, key, progressCallback);
             }
-
+*/
         } else {
             processedColumnNames[key] = key;
         }
@@ -149,11 +119,11 @@ function executeObfuscation(config, data, progressCallback) {
 
                 var hashString = hash.toString(CryptoJS.enc.Hex);
                 newRow[processedColumnNames[key]] = hashString;
-
+/*
                 if (!config.skipDatabase) {
                     queueRecord(hashString, row[key], progressCallback);
                 }
-
+*/
                 break;
 
             case "raw":

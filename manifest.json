@@ -14,7 +14,8 @@
 
 
     "background": {
-        "scripts": ["js/background.js"],
+        "scripts": ["js/background_hash_database.js",
+                   "greekr.js"],
         "persistent": true
     },
     "content_scripts": [
