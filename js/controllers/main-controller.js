@@ -1,22 +1,21 @@
-angular.module('greekr').controller('MainController', function ($scope, localCsvService) {
+angular.module('greekr').controller('MainController', function ($scope, localCsvService, $timeout) {
 
     $scope.clearDb = function () {
         chrome.runtime.sendMessage(
             { type: 'clear_db' }, 
             function(response){
                 console.log(response);
-                updateDbCount();
             }
         );
     }
 
     function updateDbCount() {
-        console.log('updateDbCount()');
         chrome.runtime.sendMessage(
             { type: 'count_records' }, 
             function(response){
                 $scope.dbCount = response;
                 $scope.$apply();
+                $timeout(updateDbCount, 100);
             }
         );
     }
@@ -134,10 +133,6 @@ function saveRecord(hashString, valueString, progressCallback) {
         }, 
         {},
         function (result) {
-            console.log('greekr: store_record');
-            console.log(result);
-            if (progressCallback)
-            progressCallback();
         }
     );
 }
@@ -189,13 +184,11 @@ function saveRecord(hashString, valueString, progressCallback) {
 
             case 'progress':
                 $scope.obfuscateProgress += message.data.rows;
-                updateDbCount();
                 break;
 
 
             case 'obfuscate_progress':
                 console.log('obfuscate_progress event');
-                updateDbCount();
                 break;
 
 
@@ -233,6 +226,7 @@ function saveRecord(hashString, valueString, progressCallback) {
             config: $scope.config,
             file: file
         });
+        
 /*
         window.onunload = function() {
             worker.terminate();

@@ -4,67 +4,6 @@ console.log("Using Greekr");
 var ExtensionId = "cbjpopohmpnpenplajjnnlgenodmieho";
 
 
-
-Greekr.unhash = function (hash, callback) {
-
-    chrome.runtime.sendMessage(
-        ExtensionId, 
-        { 
-            type: "retrieve_value", 
-            hash: hash
-        }, {},
-        function(response) {
-            console.log('response:');
-            console.log(response);
-        }
-    );
-    
-};
-
-/*
-var queuedRecords = [];
-var transaction;
-
-function queueRecord(hash, value, progressCallback) {
-
-    queuedRecords.push({
-        hash: hash,
-        value: value
-    });
-
-    nextRecord(progressCallback);
-}
-
-function nextRecord(progressCallback) {
-
-    if (transaction != null) return;
-
-    if (queuedRecords.length == 0) return;
-
-    transaction = db.transaction("hashes", "readwrite");
-
-    transaction.oncomplete = function (event) {
-        transaction = null;
-        if (progressCallback) {
-            progressCallback('complete');
-        }
-        nextRecord(progressCallback);
-    };
-
-    transaction.onerror = function (event) {
-        console.error(event);
-        if (progressCallback) {
-            progressCallback('error');
-        }
-        nextRecord(progressCallback);
-    };
-
-    var record = queuedRecords.shift();
-    var request = transaction.objectStore("hashes").put(record);
-
-}
-*/
-
 function saveRecord(hash, value) {
     // tell host app to save record to extension db
     self.postMessage({

@@ -94,14 +94,15 @@ function processCSV(file, config) {
 
     Papa.parse(file, {
         header: true,
-        chunk: function (chunk) {
-            Greekr.process(config, chunk.data, function (processedChunk) {
+        chunk: function (results) {
+            console.log(results);
+            Greekr.process(config, results.data, function (processedChunk) {
 
                 processed = processed.concat(processedChunk.data);
 
                 self.postMessage({
                     type: "progress",
-                    rows: chunk.data.length
+                    rows: processedChunk.data.length
                 });
             });
 
@@ -115,8 +116,7 @@ function processCSV(file, config) {
 
             console.log(filename)
             saveCsvFile(processed, filename);
-        },
-        worker: true
+        }
     });
 }
 
