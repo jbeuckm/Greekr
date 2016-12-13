@@ -25,9 +25,9 @@ function attemptUnhash(el) {
 
     chrome.runtime.sendMessage(ExtensionId, { type: 'retrieve_value', hash: hash }, {},
         function (result) {
-            console.log("unhash received decoded value ");
-            console.log(result);
-//            el.innerHTML = '<span class="replaced">' + result + '<\/span>';
+            if (result) {
+                el.innerHTML = '<span class="replaced">' + result.value + '<\/span>';
+            }
         }
     );
 
