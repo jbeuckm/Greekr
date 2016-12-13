@@ -5,6 +5,7 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
             { type: 'clear_db' }, 
             function(response){
                 console.log(response);
+                updateDbCount();
             }
         );
     }
@@ -117,6 +118,30 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
     $scope.configColumn = function (key, arg) {
         $scope.config.cols[key] = arg;
     };
+    
+    
+
+function saveRecord(hashString, valueString, progressCallback) {
+    
+    chrome.runtime.sendMessage(
+        ExtensionId, 
+        { 
+            type: 'store_record', 
+            record: {
+                hash: hashString,
+                value: valueString
+            }
+        }, 
+        {},
+        function (result) {
+            console.log('greekr: store_record');
+            console.log(result);
+            if (progressCallback)
+            progressCallback();
+        }
+    );
+}
+    
 
     $scope.obfuscate = function () {
 
@@ -156,6 +181,10 @@ angular.module('greekr').controller('MainController', function ($scope, localCsv
 
                 $scope.$apply();
 
+                break;
+                    
+            case 'save_record':
+                saveRecord(message.data.hash, message.data.value);
                 break;
 
             case 'progress':

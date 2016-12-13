@@ -23,9 +23,10 @@ var ExtensionId = "cbjpopohmpnpenplajjnnlgenodmieho";
 function attemptUnhash(el) {
     var hash = el.textContent;
 
-    chrome.runtime.sendMessage(ExtensionId, { hash: hash }, {},
+    chrome.runtime.sendMessage(ExtensionId, { type: 'retrieve_value', hash: hash }, {},
         function (result) {
-            console.log("unhash received decoded value "+result);
+            console.log("unhash received decoded value ");
+            console.log(result);
 //            el.innerHTML = '<span class="replaced">' + result + '<\/span>';
         }
     );

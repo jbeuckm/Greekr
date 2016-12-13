@@ -3,6 +3,8 @@ console.log("Using Greekr");
 
 var ExtensionId = "cbjpopohmpnpenplajjnnlgenodmieho";
 
+
+
 Greekr.unhash = function (hash, callback) {
 
     chrome.runtime.sendMessage(
@@ -63,16 +65,24 @@ function nextRecord(progressCallback) {
 }
 */
 
+function saveRecord(hash, value) {
+    // tell host app to save record to extension db
+    self.postMessage({
+        type: 'save_record',
+        hash: hash, 
+        value: value
+    });
+}
+
 Greekr.process = function (config, data, callback, progressCallback) {
     console.log('process')
     if (!data) {
         console.log('no data');
         return;
     }
-//    initDB(function () {
-        var result = executeObfuscation(config, data, progressCallback);
-        callback(result);
-//    });
+
+    var result = executeObfuscation(config, data, progressCallback);
+    callback(result);
 }
 
 function executeObfuscation(config, data, progressCallback) {
@@ -90,11 +100,11 @@ function executeObfuscation(config, data, progressCallback) {
 
             var hashString = hash.toString(CryptoJS.enc.Hex);
             processedColumnNames[key] = hashString;
-/*
+
             if (!config.skipDatabase) {
-                queueRecord(hashString, key, progressCallback);
+                saveRecord(hashString, key);
             }
-*/
+
         } else {
             processedColumnNames[key] = key;
         }
@@ -119,11 +129,11 @@ function executeObfuscation(config, data, progressCallback) {
 
                 var hashString = hash.toString(CryptoJS.enc.Hex);
                 newRow[processedColumnNames[key]] = hashString;
-/*
+
                 if (!config.skipDatabase) {
-                    queueRecord(hashString, row[key], progressCallback);
+                    saveRecord(hashString, row[key]);
                 }
-*/
+
                 break;
 
             case "raw":
