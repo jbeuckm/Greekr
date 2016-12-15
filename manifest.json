@@ -1,7 +1,12 @@
 {
     "name": "Greekr",
-    "description": "Reverse hashes on this page",
+    "description": "Hash your data for upload and decode in place locally for analysis.",
     "version": "0.1",
+
+    "icons": {
+        "128": "icon128.png"
+    },
+
     "permissions": [
     "activeTab"
   ],
@@ -23,7 +28,7 @@
             "matches": [
                 "https://studio.azureml.net/*"
             ],
-            "css": [],
+            "css": ["css/styles.css"],
             "js": ["greekr.js"]
     }
   ],
